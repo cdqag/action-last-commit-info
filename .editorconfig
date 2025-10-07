@@ -1,0 +1,31 @@
+# EditorConfig is awesome
+#
+# Documentation:
+#   https://EditorConfig.org
+#
+# IDE Support:
+#   IntelliJ  https://www.jetbrains.com/help/idea/editorconfig.html
+#   VSCode    https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig
+#   NeoVim    https://neovim.io/doc/user/editorconfig.html
+
+# top-most EditorConfig file
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = space
+trim_trailing_whitespace = true
+max_line_length = 300
+tab_width = 4
+
+[*.md]
+trim_trailing_whitespace = false
+
+[{*.bash,*.sh,*.zsh,*.ash,*.bats}]
+indent_style = tab
+
+[{*.yaml,*.yml}]
+indent_size = 2
+tab_width = 2

@@ -1,0 +1,92 @@
+name: 'Last Commit Info'
+description: 'Get information about the last commit'
+author: 'CDQ AG'
+
+branding:
+  icon: 'info'
+  color: 'white'
+
+inputs:
+  github-token:
+    description: 'GitHub token'
+    default: '${{ github.token }}'
+
+  repository:
+    description: 'Repository to check (default: current repository)'
+    default: '${{ github.repository }}'
+
+  path:
+    description: 'Optional file path to check for last commit (default: entire repo)'
+    default: ''
+
+outputs:
+  sha:
+    description: 'The SHA of the last commit'
+    value: ${{ steps.main.outputs.sha }}
+
+  message:
+    description: 'The commit message of the last commit'
+    value: ${{ steps.main.outputs.message }}
+
+  author-name:
+    description: 'The name of the author of the last commit'
+    value: ${{ steps.main.outputs.author-name }}
+
+  author-email:
+    description: 'The email of the author of the last commit'
+    value: ${{ steps.main.outputs.author-email }}
+
+  committer-name:
+    description: 'The name of the committer of the last commit'
+    value: ${{ steps.main.outputs.committer-name }}
+
+  committer-email:
+    description: 'The email of the committer of the last commit'
+    value: ${{ steps.main.outputs.committer-email }}
+
+  api-url:
+    description: 'The API URL of the last commit'
+    value: ${{ steps.main.outputs.api-url }}
+
+  html-url:
+    description: 'The HTML URL of the last commit'
+    value: ${{ steps.main.outputs.html-url }}
+
+runs:
+  using: composite
+  steps:
+    - id: main
+      shell: bash
+      env:
+        GH_REPO: ${{ inputs.repository }}
+        GH_REPO_PATH: ${{ inputs.path }}
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        set -e
+
+        path_part=""
+        if [ -n "$GH_REPO_PATH" ]; then
+          path_part="&path=${GH_REPO_PATH}"
+        fi
+
+        response=$(gh api "/repos/${GH_REPO}/commits?per_page=1${path_part}")
+        data=$(jq '.[0]' <<< "$response")
+
+        function export_output() {
+          local data_key=$1
+          local output_key=$2
+          local value=$(jq -r ".$data_key" <<< "$data")
+          echo "${output_key}=${value}" >> $GITHUB_OUTPUT
+        }
+
+        export_output "sha" "sha"
+        export_output "commit.message" "message"
+
+        export_output "commit.author.name" "author-name"
+        export_output "commit.author.email" "author-email"
+
+        export_output "commit.committer.name" "committer-name"
+        export_output "commit.committer.email" "committer-email"
+
+        export_output "url" "api-url"
+        export_output "html_url" "html-url"
