@@ -1,0 +1,14 @@
+name: Release
+
+on:
+  push:
+    branches:
+    - master
+    paths-ignore:
+    - .cdq/**
+
+jobs:
+  release:
+    uses: cdqag/workflow-public/.github/workflows/release-action.yaml@v1
+    with:
+      runs-on: ubuntu-latest
