@@ -74,6 +74,7 @@ runs:
           local data_key=$1
           local output_key=$2
           local value=$(jq -r ".[0].$data_key" "$TMP_FILE")
+          value=$(echo "$value" | head -n 1)
           echo "${output_key}=${value}" >> $GITHUB_OUTPUT
         }
 
